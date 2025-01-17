@@ -55,7 +55,7 @@ const MainListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Main List" onDelete={isSelectionMode ? handleMultiDelete : ()=> {}} />
+      <Header title="Main List" isDeleteButtonVisible = {selectedItems.length} onDelete={isSelectionMode ? handleMultiDelete : ()=> {}} />
 
       {/* Archived Items Section */}
       {archivedList.length > 0 && (
@@ -90,6 +90,7 @@ const MainListScreen: React.FC = () => {
             onPress={() => {
               if (isSelectionMode) {
                 toggleItemSelection(item.id);
+                if (!selectedItems.length) toggleSelectionMode();
               }
             }}
             onDelete={handleDelete}
