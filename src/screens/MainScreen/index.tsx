@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, FC } from 'react';
 import { FlatList, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import styles from './styles';
@@ -8,7 +8,7 @@ import SwipeableListItem from '../../components/SwipeableListItem';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import RootStackParamList from '../../types/RootStackParamList';
 
-const MainListScreen: React.FC = () => {
+const MainListScreen: FC = () => {
   const listContext = useContext(ListContext);
   if (!listContext) throw new Error("ListContext is undefined");
 

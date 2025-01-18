@@ -23,21 +23,40 @@ export const ListProvider: FC<ListProviderProps> = ({ children }) => {
     fetchData();
   }, []);
 
-  const archiveItem = useCallback((itemId: string) => {
-    setMainList((prev) => prev.filter((item) => item.id !== itemId));
-    setArchivedList((prev) => [
-      ...prev,
-      ...mainList.filter((item) => item.id === itemId),
-    ]);
-  }, [mainList]);
 
-  const unarchiveItem = useCallback((itemId: string) => {
-    setArchivedList((prev) => prev.filter((item) => item.id !== itemId));
-    setMainList((prev) => [
-      ...prev,
-      ...archivedList.filter((item) => item.id === itemId),
-    ]);
-  }, [archivedList]);
+const archiveItem = useCallback((itemId: string) => {
+  setMainList((prev) => {
+    const itemIndex = prev.findIndex((item) => item.id === itemId);
+    if (itemIndex === -1) return prev;
+
+    const itemToArchive = { ...prev[itemIndex], originalIndex: itemIndex };
+    setArchivedList((archivedPrev) => [...archivedPrev, itemToArchive]);
+
+    return prev.filter((_, index) => index !== itemIndex);
+  });
+}, []);
+
+
+const unarchiveItem = useCallback((itemId: string) => {
+  setArchivedList((prev) => {
+    const itemIndex = prev.findIndex((item) => item.id === itemId);
+    if (itemIndex === -1) return prev;
+
+    const itemToUnarchive = { ...prev[itemIndex] };
+    prev.splice(itemIndex, 1);
+    setMainList((mainPrev) => {
+      const updatedMainList = [...mainPrev];
+      if (itemToUnarchive.originalIndex !== undefined) {
+        updatedMainList.splice(itemToUnarchive.originalIndex, 0, itemToUnarchive);
+      } else {
+        updatedMainList.push(itemToUnarchive);
+      }
+      return updatedMainList;
+    });
+
+    return [...prev];
+  });
+}, []);
 
   const deleteItem = useCallback((itemId: string) => {
     setMainList((prev) => prev.filter((item) => item.id !== itemId));
