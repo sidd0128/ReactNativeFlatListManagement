@@ -1,4 +1,3 @@
-
 # Project Overview
 
 This project is a React Native application that provides a list management system. It allows users to view, add, archive, unarchive, and delete items. Items can be marked as archived and viewed separately. The application utilizes Context API for state management and GestureHandler for swipe actions.
@@ -30,7 +29,7 @@ The project is structured as follows:
 
 ### Breakdown of Files
 
-1. **App.tsx**: 
+1. **App.tsx**:
    - The entry point of the application. It wraps the navigation container and includes the `ListProvider` to manage the global state of the lists (main and archived).
 
 2. **ListContext.tsx**:
@@ -87,16 +86,48 @@ const [archivedList, setArchivedList] = useState<ListItem[]>([]);
 
 ### Archive and Unarchive Items
 
+#### Archive Item
+
 ```tsx
 const archiveItem = useCallback((itemId: string) => {
-  setMainList((prev) => prev.filter((item) => item.id !== itemId));
-  setArchivedList((prev) => [
-    ...prev,
-    ...mainList.filter((item) => item.id === itemId),
-  ]);
-}, [mainList]);
+  setMainList((prev) => {
+    const itemIndex = prev.findIndex((item) => item.id === itemId);
+    if (itemIndex === -1) return prev;
+
+    const itemToArchive = { ...prev[itemIndex], originalIndex: itemIndex };
+    setArchivedList((archivedPrev) => [...archivedPrev, itemToArchive]);
+
+    return prev.filter((_, index) => index !== itemIndex);
+  });
+}, []);
 ```
-- The `archiveItem` function moves an item from the main list to the archived list. The `useCallback` hook ensures that this function is memoized to avoid unnecessary re-renders.
+- The `archiveItem` function moves an item from the main list to the archived list. It also stores the original index of the item in the `originalIndex` property. This ensures that when the item is unarchived, it can be placed back in its original position in the main list.
+
+#### Unarchive Item
+
+```tsx
+const unarchiveItem = useCallback((itemId: string) => {
+  setArchivedList((prev) => {
+    const itemIndex = prev.findIndex((item) => item.id === itemId);
+    if (itemIndex === -1) return prev;
+
+    const itemToUnarchive = { ...prev[itemIndex] };
+    prev.splice(itemIndex, 1);
+    setMainList((mainPrev) => {
+      const updatedMainList = [...mainPrev];
+      if (itemToUnarchive.originalIndex !== undefined) {
+        updatedMainList.splice(itemToUnarchive.originalIndex, 0, itemToUnarchive);
+      } else {
+        updatedMainList.push(itemToUnarchive);
+      }
+      return updatedMainList;
+    });
+
+    return [...prev];
+  });
+}, []);
+```
+- The `unarchiveItem` function restores an item from the archived list to the main list. If the item has an `originalIndex`, it will be placed back in its original position in the main list. Otherwise, it will be added to the end of the list.
 
 ### SwipeableListItem Actions
 
