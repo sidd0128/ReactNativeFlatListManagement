@@ -143,6 +143,11 @@ const unarchiveItem = useCallback((itemId: string) => {
 ```
 - The `ConfirmationModal` component is used to confirm deletions before they are performed.
 
+## Video Example
+
+https://github.com/user-attachments/assets/b8405e1b-aa22-4ac4-93dc-6df3e2dd1860
+
+
 ## Conclusion
 
 This project showcases how to manage a list of items with archiving, unarchiving, deletion, and multi-selection features. The use of Context API for state management and GestureHandler for swipe actions makes the app interactive and responsive. Each component is reusable and follows the best practices of component-based architecture.
